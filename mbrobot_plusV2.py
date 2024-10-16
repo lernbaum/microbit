@@ -9,8 +9,6 @@ import neopixel
 
 _v = 50
 _axe = 0.082
-_min_angle_val = 25
-_max_angle_val = 131
         
 def w(d1, s1, d2, s2):
     """
