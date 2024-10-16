@@ -1,13 +1,11 @@
 # mbrobot_plusV2.py
-# Version 1.4 BD (14.10.2024)
-# basiert syntaktisch auf der Variante von TigerJython
+# Version 1.5 BD (16.10.2024)
+# basiert syntaktisch auf der Vorlage von TigerJython
 
 from microbit import i2c,pin0,pin1,pin2,pin13,pin14,pin15,sleep,display
 import machine
-import gc
 import music
 import neopixel
-# import display
 
 _v = 50
 _axe = 0.082
@@ -16,21 +14,19 @@ _max_angle_val = 131
         
 def w(d1, s1, d2, s2):
     """
-        - soll nicht verwendet werden
-        - wird für Motorsteuerung im Hintegrund gebraucht
+        - helper function
+        - should not be called directly
     """
     try:
         i2c.write(0x10, bytearray([0x00,d1, s1, d2, s2]))      
     except:
         print("Error writing to i2c bus!")
-        while True:
-            pass
  
 def setSpeed(speed):    
     """
-        - setze Fahrgeschwindigkeit in willkürlichen Einheiten
-        - Standardspeed ist 50
-        - speed: -255 bis 255
+        - set speed (arbitrary units)
+        - default speed 50
+        - range: -255 to 255
     """       
     global _v
     if speed > 255:
@@ -43,40 +39,53 @@ def setSpeed(speed):
 
 def stop():
     """
-        - stoppe Roboter
-        - keinen Einfluss auf LEDs
+        - stop robot motion
+        - doesn't affect LEDs
     """
     w(0, 0, 0, 0) 
 
 
+def reset():
+    """
+        - stop robot motion
+        - turn off LEDs
+        - reset speed to default 50
+    """
+    resetSpeed()
+    stop()
+    clearRGB()
+    clearLED()
+    display.clear()
+
 def resetSpeed():
     """
-        - speed auf Standardwert von 50
+        - set speed to default 50
     """
+    global _v
     _v = 50          
 
 
 def forward():
     """
-        - setzt den Roboter in eine Vorwärtsbewegung
-        - fährt solange vorwärts, bis ein anderer Befehl kommt
+        - forward motion
+        - keeps driving until another command is given
     """
     w(0, _v, 0, _v)
 
 
 def backward():
     """
-        - setzt den Roboter in eine Rückwärtsbewegung
-        - fährt solange rückwärts, bis ein anderer Befehl kommt
+        - backward motion
+        - keeps driving until another command is given
     """
     w(1, _v, 1, _v)          
 
          
 def left():
     """
-        - versetzt den Roboter in eine Linksdrehung (Gegenuhrzeigersinn)
-        - dreht solange, bis ein anderer Befehl kommt
-        - rechter Motor dreht vorwärts, linker Motor dreht rückwärts
+        - left rotation (counterclockwise)
+        - keeps rotating until another command is given
+        - right motor spins forward, left motor backward
     """   
     m = 1
     w(1, int(_v * m), 0, int(_v * m))
@@ -84,21 +93,21 @@ def left():
 
 def right():
     """
-        - versetzt den Roboter in eine Rechtsdrehung (Uhrzeigersinn)
-        - dreht solange, bis ein anderer Befehl kommt
-        - linker Motor dreht vorwärts, rechter Motor dreht rückwärts
+        - right rotation (clockwise)
+        - keeps rotating until another command is given
+        - left motor spins forward, right motor backward
     """   
     m = 1
     w(0, int(_v * m), 1, int(_v * m))
 
 
-def leftArc(r):
+def leftArc(radius):
     """
-        - versetzt den Roboter in eine Linkskurve (Gegenuhrzeigersinn)
-        - r: Radius in m
-        - fährt solange, bis ein anderer Befehl kommt
-        - rechter Motor dreht schnell vorwärts, linker Motor dreht langsamer vorwärts
-        - Mitte des Roboters behält ungefähr den Vorwärtsspeed bei
+        - turns the robot to the left (counterclockwise)
+        - r: radius in m
+        - keeps rotating until another command is given
+        - right motor spins forward fast, left motor spins forward slow
+        - robot center drives at forward speed
     """   
     v = abs(_v)
     if r < _axe:
@@ -112,13 +121,13 @@ def leftArc(r):
         w(1, v, 1, v1)
 
 
-def rightArc(r):
+def rightArc(radius):
     """
-        - versetzt den Roboter in eine Rechtskurve (Uhrzeigersinn)
-        - r: Radius in m
-        - fährt solange, bis ein anderer Befehl kommt
-        - linker Motor dreht schnell vorwärts, rechter Motor dreht langsamer vorwärts
-        - Mitte des Roboters behält ungefähr den Vorwärtsspeed bei
+        - turns the robot to the right (clockwise)
+        - radius in m
+        - keeps rotating until another command is given
+        - left motor spins forward fast, right motor spins forward slow
+        - robot center drives at forward speed
     """   
     v = abs(_v)
     if r < _axe:
@@ -134,10 +143,10 @@ def rightArc(r):
 
 def getDistance():
     """
-        - sendet ein Signal aus dem Ultraschallsensor (vorne) und misst Reflexionszeit
-        - Rückgabewert in Zentimeter
-        - Rückgabewert Ganzzahl zwischen 0 und maximal 255 Zentimeter
-        - Rückgabewert von 255: kein Signal erhalten oder zu weit weg
+        - sends a signal from the ultrasonic sensor (front) and measures the reflection time
+        - return value in centimeters
+        - return value is an integer between 0 and a maximum of 255
+        - return value of 255: no signal received or object is too far away
     """   
     max_time = int(255/34300*1000000)
     trig = pin13
@@ -161,9 +170,7 @@ class Motor:
         try:
             i2c.write(0x10, bytearray([self._id, d, s]))
         except:
-            print("Please switch on mbRobot!")
-            while True:
-                pass               
+            print("Please switch on mbRobot!")              
 
     def rotate(self, s):
         p = abs(s) 
@@ -177,10 +184,10 @@ class Motor:
 
 def setLED(state):  
     """
-        - steuert beide LEDs (rot, vorne)
-        - state: 0 (aus) oder 1 (an)
-        - Zustand wird beibehalten, bis ein neuer LED Befehl kommt
-        - gleichbedeutend mit setLEDl(state) und setLEDr(state)
+        - controls both LEDs (red, in front)
+        - state: 0 (off) or 1 (on)
+        - state is maintained until a new LED command is given
+        - equivalent to setLEDl(state) and setLEDr(state).
     """     
     i2c.write(0x10, bytearray([0x0B, state]))
     i2c.write(0x10, bytearray([0x0C, state]))
@@ -188,38 +195,35 @@ def setLED(state):
  
 def setLEDl(state):
     """
-        - steuert die linke LED (rot, vorne)
-        - state: 0 (aus) oder 1 (an)
-        - Zustand wird beibehalten, bis ein neuer LED Befehl kommt
+        - controls the left LED (red, in front)
+        - state: 0 (off) or 1 (on)
+        - state is maintained until a new LED command is given
     """  
     i2c.write(0x10, bytearray([0x0B, state]))
     
   
 def setLEDr(state):
     """
-        - steuert die rechte LED (rot, vorne)
-        - state: 0 (aus) oder 1 (an)
-        - Zustand wird beibehalten, bis ein neuer LED Befehl kommt
-    """ 
+        - controls the right LED (red, in front)
+        - state: 0 (off) or 1 (on)
+        - state is maintained until a new LED command is given
+    """  
     i2c.write(0x10, bytearray([0x0C, state]))
 
 
 def clearLED():
     """
-        - löscht beide LEDs (rot, vorne)
-        - gleichbedeutend mit setLED(0)
-    """   
+        - turns off both LEDs (red, in front)
+        - equivalent to setLED(0)
+    """  
     i2c.write(0x10, bytearray([0x0B, 0]))
     i2c.write(0x10, bytearray([0x0C, 0]))
 
-np_rgb_pixels = neopixel.NeoPixel(pin15, 4)
-
-
 def setRGB(r, g, b): 
     """
-        - steuert die RGB LEDs (unten)
-        - steuert alle 4 LEDs gleichzeitig
-        - r,g,b: Farbwerte zwischen 0 und 255
+        - controls the RGB LEDs on the bottom
+        - controls all 4 LEDs simultaneously
+        - r, g, b: color values between 0 and 255
     """      
     for id in range(len(np_rgb_pixels)):
         np_rgb_pixels[id] = (r,g,b)
@@ -229,29 +233,26 @@ def setRGB(r, g, b):
 
 def setRGBl1(r, g, b):
     """
-        - steuert die linke vordere RGB LED (unten)
-        - r,g,b: Farbwerte zwischen 0 und 255
-        - Zustand wird beibehalten, bis ein neuer RGB Befehl kommt
-    """       
+        - controls RGB LED on the bottom (left, front)
+        - r, g, b: color values between 0 and 255
+    """      
     np_rgb_pixels[0] = (r,g,b)
     np_rgb_pixels.show()
 
 
 def setRGBl2(r, g, b):   
     """
-        - steuert die linke hintere RGB LED (unten)
-        - r,g,b: Farbwerte zwischen 0 und 255
-        - Zustand wird beibehalten, bis ein neuer RGB Befehl kommt
-    """    
+        - controls RGB LED on the bottom (left, back)
+        - r, g, b: color values between 0 and 255
+    """      
     np_rgb_pixels[1] = (r,g,b)
     np_rgb_pixels.show()
 
 
 def setRGBr1(r, g, b):    
     """
-        - steuert die rechte vordere RGB LED (unten)
-        - r,g,b: Farbwerte zwischen 0 und 255
-        - Zustand wird beibehalten, bis ein neuer RGB Befehl kommt
+        - controls RGB LED on the bottom (right, front)
+        - r, g, b: color values between 0 and 255
     """   
     np_rgb_pixels[3] = (r,g,b)
     np_rgb_pixels.show()
@@ -259,9 +260,8 @@ def setRGBr1(r, g, b):
 
 def setRGBr2(r, g, b):
     """
-        - steuert die rechte hintere RGB LED (unten)
-        - r,g,b: Farbwerte zwischen 0 und 255
-        - Zustand wird beibehalten, bis ein neuer RGB Befehl kommt
+        - controls RGB LED on the bottom (right, back)
+        - r, g, b: color values between 0 and 255
     """   
     np_rgb_pixels[2] = (r,g,b)
     np_rgb_pixels.show()
@@ -269,27 +269,27 @@ def setRGBr2(r, g, b):
 
 def clearRGB():
     """
-        - löschte alle RGB LEDs (unten)
-        - gleichbedeutend mit setRGB(0,0,0)
+        - turns off all RGB LEDs on the bottom
+        - equivalent to setRGB(0,0,0)
     """   
     for id in range(len(np_rgb_pixels)):
         np_rgb_pixels[id] = (0,0,0)
     np_rgb_pixels.show()
     
 
-def setBuzzer(state):
+def setBuzzer(frequency):
     """
-        - lässt einen Ton auf dem Buzzer abspielen
-        - state: Frequenz des tons zwischen etwa 40 und 16'000
-        - je höher die Frequenz, desto höher der Ton
-        - Ton spielt genau 0.1 Sekunden
-    """  
+        - plays a sound on the buzzer
+        - frequency: frequency of the sound between 40 and 16'00 Hz
+        - higher frequency means higher pitch
+        - sound plays for 0.1 seconds
+    """
     music.pitch(state, 100, wait=False)
     
 def ir_read_values_as_byte():
     """
-        - muss nicht direkt verwendet werden
-        - wird im Hintergrund gebraucht, um Daten auszulesen
+        - helper function
+        - should not be called directly
     """
     i2c.write(0x10, bytearray([0x1D]))
     buf = i2c.read(0x10, 1)
@@ -298,10 +298,8 @@ def ir_read_values_as_byte():
 
 def show_number(value, max):
     """ 
-        - lässt die LED Matrix aufleuchten
-        - Die Anzahl leuchtender LEDs ist im Verhältnis von value/max
-        - value: anzuzeigender Wert
-        - max: im Verhältnis zum Maximum
+        - turn on LED matrix on micro:bit
+        - number of lit LEDs is proportional to value/max
     """      
     if value > max:
         value = max
@@ -315,16 +313,21 @@ def show_number(value, max):
         display.set_pixel(x,y,9)
 
 
-def setAlarm(on):
+def setAlarm():
     """ 
-        - lässt eine kurze Alarmmelodie abspielen
-        - on: True zum Abspielen, False zum stoppen
+        - plays a short alarm melody
     """  
-    if on:
-        music.play(_m, wait = False, loop = True)    
-    else:
-        music.stop()
-        
+    _m = music.POWER_UP
+    music.play(_m, wait = False, loop = True)    
+
+    for i in range(3):
+        setLED(1)
+        setRGB(255,0,0)
+        delay(500)
+        setLED(0)
+        setRGB(0,0,0)
+        delay(500)
+
 class IR:
     R2 = 0
     R1 = 1
@@ -342,7 +345,6 @@ class IRSensor:
         return (byte & IR.masks[self.index]) >> self.index
 
 try:
-        
     irLeft = IRSensor(IR.L1)
     irRight = IRSensor(IR.R1)
     irL1 = IRSensor(IR.L1)
@@ -353,21 +355,19 @@ try:
     pin2.set_pull(pin2.NO_PULL)
     motL = Motor(0)
     motR = Motor(1)
+    np_rgb_pixels = neopixel.NeoPixel(pin15, 4)
     delay = sleep
 
 
     def init():
-        try: # fails if micro:bit not inserted into maqueen
-            stop()
-            
+        try: # fails if micro:bit not inserted into maqueen            
             pin13.write_digital(0)  # ultrasonic trigger
             pin14.read_digital()    # ultrasonic echo
-            # reset LEDs at startup    
-            clearRGB()
-            clearLED()
+            reset()
         except:
             pass
             
     init()
+    print(" >  robot running ...")
 except:
     pass
