@@ -88,6 +88,13 @@ def left():
     m = 1
     w(1, int(_v * m), 0, int(_v * m))
 
+def delay(ms):
+    """
+        - stops program execution for a time
+        - ms: number of milliseconds
+        - doesn't stop the robot or turn off the LEDs
+    """
+    sleep(ms)
 
 def right():
     """
@@ -354,7 +361,6 @@ try:
     motL = Motor(0)
     motR = Motor(1)
     np_rgb_pixels = neopixel.NeoPixel(pin15, 4)
-    delay = sleep
 
 
     def init():
