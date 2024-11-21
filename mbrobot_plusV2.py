@@ -108,10 +108,10 @@ def leftArc(radius):
         - robot center drives at forward speed
     """   
     v = abs(_v)
-    if r < _axe:
+    if radius < _axe:
         v1 = 0
     else:
-        f = (r - _axe) / (r + _axe) * (1 - v * v / 200000)             
+        f = (radius - _axe) / (radius + _axe) * (1 - v * v / 200000)             
         v1 = int(f * v)
     if _v > 0:
         w(0, v1, 0, v)
@@ -128,10 +128,10 @@ def rightArc(radius):
         - robot center drives at forward speed
     """   
     v = abs(_v)
-    if r < _axe:
+    if radius < _axe:
         v1 = 0
     else:
-        f = (r - _axe) / (r + _axe) * (1 - v * v / 200000)        
+        f = (radius - _axe) / (radius + _axe) * (1 - v * v / 200000)        
         v1 = int(f * v)
     if _v > 0:
         w(0, v, 0, v1)
