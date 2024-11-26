@@ -18,7 +18,7 @@ def w(d1, s1, d2, s2):
     try:
         i2c.write(0x10, bytearray([0x00,d1, s1, d2, s2]))      
     except:
-        print("Error writing to i2c bus!")
+        print(" > Error writing to i2c bus!")
  
 def setSpeed(speed):    
     """
@@ -168,7 +168,7 @@ class Motor:
         try:
             i2c.write(0x10, bytearray([self._id, d, s]))
         except:
-            print("Please switch on mbRobot!")              
+            print(" > Please switch on Maqueen.")              
 
     def rotate(self, s):
         p = abs(s) 
@@ -282,7 +282,7 @@ def setBuzzer(frequency):
         - higher frequency means higher pitch
         - sound plays for 0.1 seconds
     """
-    music.pitch(state, 100, wait=False)
+    music.pitch(frequency, 100, wait=False)
     
 def ir_read_values_as_byte():
     """
@@ -316,15 +316,15 @@ def alarm():
         - plays a short alarm melody
     """  
     _m = music.POWER_UP
-    music.play(_m, wait = False, loop = True)    
+    music.play(_m, wait = False, loop = False)    
 
-    for i in range(3):
+    for i in range(10):
         setLED(1)
         setRGB(255,0,0)
-        delay(500)
+        delay(100)
         setLED(0)
         setRGB(0,0,0)
-        delay(500)
+        delay(100)
 
 class IR:
     R2 = 0
@@ -358,14 +358,12 @@ try:
 
 
     def init():
-        try: # fails if micro:bit not inserted into maqueen            
-            pin13.write_digital(0)  # ultrasonic trigger
-            pin14.read_digital()    # ultrasonic echo
-            reset()
-        except:
-            pass
-            
+        pin13.write_digital(0)  # ultrasonic trigger
+        pin14.read_digital()    # ultrasonic echo
+        reset()
+  
     init()
-    print(" >Robot successfully initialised ...")
+    print(" > Maqueen is running...")
 except:
-    pass
+    print(" > micro:bit not connected to Maqueen?")
+
