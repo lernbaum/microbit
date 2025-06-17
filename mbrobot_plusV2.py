@@ -26,13 +26,16 @@ def setSpeed(speed):
         - default speed 50
         - range: -255 to 255
     """       
-    global _v
-    if speed > 255:
-        _v = 255
-    elif speed < -255:
-        _v = -255
-    else:
-        _v = speed 
+
+    if abs(speed) < 30:
+        print(" > minimal speed is 30")
+        return
+    elif abs(speed) > 255:
+        print(" > maximum speed is 255")
+        return
+     
+    global _v 
+    _v = speed 
 
 
 def stop():
