@@ -282,6 +282,9 @@ def setBuzzer(frequency):
         - higher frequency means higher pitch
         - sound plays for 0.1 seconds
     """
+    if frequency < 20:
+        return 
+    
     music.pitch(frequency, 100, wait=False)
     
 def ir_read_values_as_byte():
@@ -338,9 +341,9 @@ class IRSensor:
     def __init__(self, index):
         self.index = index
         
-    def read_digital(self):
+    def isBlack(self):
         byte = ir_read_values_as_byte()
-        return (byte & IR.masks[self.index]) >> self.index
+        return not ((byte & IR.masks[self.index]) >> self.index)
 
 try:
     irLeft = IRSensor(IR.L1)
