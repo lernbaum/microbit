@@ -344,9 +344,9 @@ class IRSensor:
     def __init__(self, index):
         self.index = index
         
-    def isBlack(self):
+    def isWhite(self):
         byte = ir_read_values_as_byte()
-        return not ((byte & IR.masks[self.index]) >> self.index)
+        return (byte & IR.masks[self.index]) >> self.index
 
 try:
     irLeft = IRSensor(IR.L1)
