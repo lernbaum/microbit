@@ -352,7 +352,7 @@ class IRSensor:
     def __init__(self, index):
         self.index = index
         
-    def is_white(self):
+    def isWhite(self):
         """
             - return True, if the sensor detects an infrared reflection (white surface)
             - False, if black surface or surface too far away
