@@ -22,9 +22,10 @@ def w(d1, s1, d2, s2):
  
 def setSpeed(speed):    
     """
-        - set speed (arbitrary units)
+        - set speed (arbitrary unit)
+        - minimal speed is 30
         - default speed 50
-        - range: -255 to 255
+        - range: 30 to 255
     """       
 
     if abs(speed) < 30:
@@ -173,11 +174,14 @@ class Motor:
         except:
             print(" > Please switch on Maqueen.")              
 
-    def rotate(self, s):
+    def rotate(self, speed):
+        """
+            rotates the motor with a certain speed 
+        """
         p = abs(s) 
-        if s > 0:
+        if speed > 0:
             self._w(0, p)    
-        elif s < 0:
+        elif speed < 0:
             self._w(1, p) 
         else:   
             self._w(0, 0)
@@ -281,11 +285,15 @@ def clearRGB():
 def setBuzzer(frequency):
     """
         - plays a sound on the buzzer
-        - frequency: frequency of the sound between 40 and 16'00 Hz
+        - frequency: frequency of the sound between 40 and 16'000 Hz
         - higher frequency means higher pitch
         - sound plays for 0.1 seconds
     """
-    if frequency < 20:
+    if frequency < 40:
+        print("frequency of buzzer too low; minimum 40 Hz")
+        return 
+    elif frequency > 16000:
+        print("frequency of buzzer too high; maximum 16'000 Hz")
         return 
     
     music.pitch(frequency, 100, wait=False)
@@ -344,7 +352,11 @@ class IRSensor:
     def __init__(self, index):
         self.index = index
         
-    def isWhite(self):
+    def is_white(self):
+        """
+            - return True, if the sensor detects an infrared reflection (white surface)
+            - False, if black surface or surface too far away
+        """
         byte = ir_read_values_as_byte()
         return (byte & IR.masks[self.index]) >> self.index
 
