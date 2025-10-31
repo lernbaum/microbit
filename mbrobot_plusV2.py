@@ -28,7 +28,7 @@ def setSpeed(speed):
         - range: 30 to 255
     """       
 
-    if abs(speed) < 30:
+    if speed < 30:
         print(" > minimal speed is 30")
         return
     elif abs(speed) > 255:
