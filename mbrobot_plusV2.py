@@ -178,7 +178,7 @@ class Motor:
         """
             rotates the motor with a certain speed 
         """
-        p = abs(s) 
+        p = abs(speed) 
         if speed > 0:
             self._w(0, p)    
         elif speed < 0:
