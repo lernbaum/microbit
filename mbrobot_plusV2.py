@@ -18,7 +18,7 @@ def w(d1, s1, d2, s2):
     try:
         i2c.write(0x10, bytearray([0x00,d1, s1, d2, s2]))      
     except:
-        print(" > Error writing to i2c bus!")
+        print(" > Error. micro:bit not connected to maqueen robot?")
  
 def setSpeed(speed):    
     """
