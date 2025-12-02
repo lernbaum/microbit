@@ -234,6 +234,7 @@ def setRGB(r, g, b):
         np_rgb_pixels[id] = (r,g,b)
     
     np_rgb_pixels.show()
+    delay(1)
 
 
 def setRGBl1(r, g, b):
@@ -243,6 +244,7 @@ def setRGBl1(r, g, b):
     """      
     np_rgb_pixels[0] = (r,g,b)
     np_rgb_pixels.show()
+    delay(1)
 
 
 def setRGBl2(r, g, b):   
@@ -252,6 +254,7 @@ def setRGBl2(r, g, b):
     """      
     np_rgb_pixels[1] = (r,g,b)
     np_rgb_pixels.show()
+    delay(1)
 
 
 def setRGBr1(r, g, b):    
@@ -261,6 +264,7 @@ def setRGBr1(r, g, b):
     """   
     np_rgb_pixels[3] = (r,g,b)
     np_rgb_pixels.show()
+    delay(1)
 
 
 def setRGBr2(r, g, b):
@@ -270,6 +274,7 @@ def setRGBr2(r, g, b):
     """   
     np_rgb_pixels[2] = (r,g,b)
     np_rgb_pixels.show()
+    delay(1)
 
 
 def clearRGB():
@@ -280,7 +285,8 @@ def clearRGB():
     for id in range(len(np_rgb_pixels)):
         np_rgb_pixels[id] = (0,0,0)
     np_rgb_pixels.show()
-    
+    delay(1)
+
 
 def setBuzzer(frequency):
     """
