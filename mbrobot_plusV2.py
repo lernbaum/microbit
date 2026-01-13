@@ -19,7 +19,8 @@ def w(d1, s1, d2, s2):
         i2c.write(0x10, bytearray([0x00,d1, s1, d2, s2]))      
     except:
         print(" > Error. micro:bit not connected to maqueen robot?")
- 
+    delay(1)
+
 def setSpeed(speed):    
     """
         - set speed (arbitrary unit)
@@ -56,8 +57,11 @@ def reset():
     resetSpeed()
     stop()
     clearRGB()
+    delay(1)
     clearLED()
+    delay(1)
     display.clear()
+    delay(1)
 
 def resetSpeed():
     """
@@ -161,6 +165,7 @@ def getDistance():
         return 255
     
     t_echo = micros / 1000000
+    delay(1)
     return int((t_echo/2)*34300-1)
 
 
@@ -173,6 +178,7 @@ class Motor:
             i2c.write(0x10, bytearray([self._id, d, s]))
         except:
             print(" > Please switch on Maqueen.")              
+        delay(1)
 
     def rotate(self, speed):
         """
@@ -196,7 +202,7 @@ def setLED(state):
     """     
     i2c.write(0x10, bytearray([0x0B, state]))
     i2c.write(0x10, bytearray([0x0C, state]))
-        
+    delay(1)
  
 def setLEDl(state):
     """
@@ -204,9 +210,9 @@ def setLEDl(state):
         - state: 0 (off) or 1 (on)
         - state is maintained until a new LED command is given
     """  
-    i2c.write(0x10, bytearray([0x0B, state]))
-    
-  
+    i2c.write(0x10, bytearray([0x0B, state]))    
+    delay(1)
+
 def setLEDr(state):
     """
         - controls the right LED (red, in front)
@@ -214,6 +220,7 @@ def setLEDr(state):
         - state is maintained until a new LED command is given
     """  
     i2c.write(0x10, bytearray([0x0C, state]))
+    delay(1)
 
 
 def clearLED():
@@ -223,6 +230,7 @@ def clearLED():
     """  
     i2c.write(0x10, bytearray([0x0B, 0]))
     i2c.write(0x10, bytearray([0x0C, 0]))
+    delay(1)
 
 def setRGB(r, g, b): 
     """
@@ -303,7 +311,8 @@ def setBuzzer(frequency):
         return 
     
     music.pitch(frequency, 100, wait=False)
-    
+    delay(1)
+
 def ir_read_values_as_byte():
     """
         - helper function
@@ -329,6 +338,7 @@ def show_number(value, max):
         x = i%5
         y = i//5
         display.set_pixel(x,y,9)
+    delay(1)
 
 
 def alarm():
@@ -364,7 +374,10 @@ class IRSensor:
             - False, if black surface or surface too far away
         """
         byte = ir_read_values_as_byte()
+        delay(1)
         return (byte & IR.masks[self.index]) >> self.index
+
+delay = sleep
 
 try:
     irLeft = IRSensor(IR.L1)
@@ -378,8 +391,6 @@ try:
     motL = Motor(0)
     motR = Motor(1)
     np_rgb_pixels = neopixel.NeoPixel(pin15, 4)
-    delay = sleep
-
 
     def init():
         pin13.write_digital(0)  # ultrasonic trigger
@@ -387,7 +398,6 @@ try:
         reset()
   
     init()
-    print(" > Maqueen is running...")
 except:
     print(" > micro:bit not connected to Maqueen?")
 
