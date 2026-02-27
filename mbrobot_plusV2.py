@@ -6,6 +6,7 @@ from microbit import i2c,pin0,pin1,pin2,pin13,pin14,pin15,sleep,display
 import machine
 import music
 import neopixel
+from utime import sleep_us
 
 _v = 50
 _axe = 0.082
@@ -157,16 +158,23 @@ def getDistance():
     max_time = int(255/34300*1000000)
     trig = pin13
     echo = pin14
-    trig.write_digital(1)
-    trig.write_digital(0)
-    micros = machine.time_pulse_us(echo, 1, max_time)
     
+    trig.write_digital(0)
+    sleep_us(5)
+
+    # Send 10 µs pulse
+    trig.write_digital(1)
+
+    micros = machine.time_pulse_us(echo, 1, max_time)
+
     if micros < 0: # error
         return 255
     
     t_echo = micros / 1000000
     delay(1)
-    return int((t_echo/2)*34300-1)
+    d = int((t_echo/2)*34300-1)
+
+    return d
 
 
 class Motor:
