@@ -160,7 +160,7 @@ def getDistance():
     echo = pin14
     
     trig.write_digital(0)
-    sleep_us(5)
+    delay(1)
 
     # Send 10 µs pulse
     trig.write_digital(1)
@@ -171,7 +171,8 @@ def getDistance():
         return 255
     
     t_echo = micros / 1000000
-    delay(1)
+    delay(10)
+    
     d = int((t_echo/2)*34300-1)
 
     return d
