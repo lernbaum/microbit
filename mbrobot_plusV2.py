@@ -148,6 +148,7 @@ def rightArc(radius):
         w(1, v1, 1, v)    
 
 
+
 def getDistance():
     """
         - sends a signal from the ultrasonic sensor (front) and measures the reflection time
@@ -155,15 +156,13 @@ def getDistance():
         - return value is an integer between 0 and a maximum of 255
         - return value of 255: no signal received or object is too far away
     """   
-    max_time = int(255/34300*1000000)
+
+    max_time = 20000
     trig = pin13
     echo = pin14
     
-    trig.write_digital(0)
-    delay(1)
-
-    # Send 10 µs pulse
     trig.write_digital(1)
+    trig.write_digital(0)
 
     micros = machine.time_pulse_us(echo, 1, max_time)
 
@@ -171,10 +170,8 @@ def getDistance():
         return 255
     
     t_echo = micros / 1000000
-    delay(10)
     
     d = int((t_echo/2)*34300-1)
-
     return d
 
 
