@@ -382,6 +382,14 @@ class IRSensor:
         byte = ir_read_values_as_byte()
         delay(1)
         return (byte & IR.masks[self.index]) >> self.index
+    
+
+    def getValue(self):
+            i2c.write(0x10, bytearray([0x1D]))
+            buf = i2c.read(0x10, 11)
+            value = buf[1+self.index*2]
+            return value
+
 
 delay = sleep
 
