@@ -157,6 +157,8 @@ def getDistance():
         - return value of 255: no signal received or object is too far away
     """   
 
+    delay(10)
+
     max_time = 20000
     trig = pin13
     echo = pin14
@@ -172,6 +174,9 @@ def getDistance():
     t_echo = micros / 1000000
     
     d = int((t_echo/2)*34300-1)
+
+    delay(10)
+    
     return d
 
 
