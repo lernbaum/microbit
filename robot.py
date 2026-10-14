@@ -1,5 +1,5 @@
 # robot.py
-# Version 2.0 BD (13.10.2026)
+# Version 2.1 BD (14.10.2026)
 
 from microbit import i2c,pin13,pin14,pin15,sleep,display
 import machine
@@ -14,13 +14,17 @@ __mappingv21 = [2,1,3,0,4]
 __mappingv20 = [2,3,1,4,0]
 __mapping = None
 
+def __haltProgram():
+    while True:
+        sleep(1000)
+
 def __haltOnI2CDisconnect():
     print(" > Maqueen connection to microbit lost. Beware of faulty connections. Stopping program.")
     for y in range(5):
         for x in range(5):
             display.set_pixel(x, y, 9)
 
-    exit(1)
+    __haltProgram()
 
 def __i2cWrite(addr, data):
     try:
@@ -322,4 +326,4 @@ try:
 except Exception as e:
     print(" > micro:bit not connected to Maqueen?")
     print(e)
-    exit(1)
+    __haltProgram()
